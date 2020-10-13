@@ -2,6 +2,8 @@ const esbuild = require("esbuild");
 const yargs = require("yargs");
 const chalk = require("chalk");
 const fg = require("fast-glob");
+const { join } = require("path");
+const { copyFile } = require("fs");
 
 const target = yargs.usage(`Usage: $0 -t [functions/cdk]`).option("t", {
   alias: "target",
@@ -56,6 +58,38 @@ async function buildFunctions() {
   }
 }
 
+async function buildExtension() {
+  const scriptHackFileLocation = join(
+    __dirname,
+    "./layers/extensions/extension.sh"
+  );
+  const newScriptHackFileLocation = join(
+    __dirname,
+    "./dist/layers/extensions/extension.sh"
+  );
+
+  console.log(chalk.green("Building extension"));
+  const files = await fg(["./layers/**/*.ts"]);
+
+  try {
+    await esbuild.build({
+      entryPoints: files,
+      bundle: true,
+      color: false,
+      minify: true,
+      outdir: "dist/layers/extensions/extension",
+      target: "node12",
+      platform: "node",
+      format: "cjs"
+    });
+    console.log(chalk.green("Build complete"));
+    // copy the .sh
+    copyFile(scriptHackFileLocation, newScriptHackFileLocation, () => {});
+  } catch (e) {
+    console.log(chalk.red("Failed to build", e.message));
+  }
+}
+
 async function build() {
   if (target.t == "cdk") {
     return await buildCDK();
@@ -63,6 +97,10 @@ async function build() {
 
   if (target.t == "functions") {
     return await buildFunctions();
+  }
+
+  if (target.t == "extension") {
+    return await buildExtension();
   }
 
   throw new Error("Unknown target.");

@@ -1,20 +1,18 @@
 {
-  "name": "cdk-boilerplate",
+  "name": "node-lambda-extension",
   "version": "0.1.0",
-  "bin": {
-    "cdk-boilerplate": "bin/cdk-boilerplate.js"
-  },
   "scripts": {
     "dev": "tsc -w",
     "build:cdk": "node build.js -t cdk",
     "build:functions": "node build.js -t functions",
-    "build": "npm run clean && npm run build:cdk && npm run build:functions",
+    "build:extension": "node build.js -t extension",
+    "build": "npm run clean && npm run build:cdk && npm run build:functions && npm run build:extension",
     "test": "is-ci \"test:ci\" \"test:watch\"",
     "test:watch": "jest --watch",
     "test:ci": "jest --runInBand --detectOpenHandles",
     "clean": "rm -rf dist cdk.out",
     "synth": "npm run build && cdk synth",
-    "deploy": "npm run synth && cdk deploy",
+    "deploy": "npm run synth && chmod +x dist/layers/extensions/extension.sh && cdk deploy",
     "bootstrap": "npm run synth && cdk bootstrap"
   },
   "devDependencies": {
@@ -22,7 +20,7 @@
     "@types/app-root-path": "1.2.4",
     "@types/aws-lambda": "8.10.63",
     "@types/jest": "26.0.10",
-    "@types/node": "10.17.27",
+    "@types/node": "12.0.0",
     "app-root-path": "3.0.0",
     "chalk": "4.1.0",
     "esbuild": "0.7.8",
@@ -30,6 +28,7 @@
     "is-ci": "2.0.0",
     "is-ci-cli": "2.1.2",
     "jest": "26.4.2",
+    "msw": "0.21.2",
     "ts-jest": "26.2.0",
     "ts-node": "8.1.0",
     "typescript": "4.0.3",

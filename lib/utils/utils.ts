@@ -5,4 +5,8 @@ function getFunctionPath(pathFromFunctionsDir: string) {
   return join(path, `dist/functions/${pathFromFunctionsDir}`);
 }
 
-export { getFunctionPath };
+function fromRoot(pathFromRoot: string) {
+  return join(path, pathFromRoot);
+}
+
+export { getFunctionPath, fromRoot };
